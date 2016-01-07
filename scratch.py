@@ -4,9 +4,10 @@ import urllib.request
 import re
 from html.parser import HTMLParser
 import csv
+from time import sleep
 
 Home = "http://movie.douban.com"
-MaxLimit = 1
+MaxLimit = 3
 
 class ArticleParser(HTMLParser):
 	def __init__(self):
@@ -17,6 +18,7 @@ class ArticleParser(HTMLParser):
 		self.content += data
 
 def get(url):
+	sleep(1.5)
 	response = urllib.request.urlopen(url)
 	return response.read().decode()
 
@@ -40,7 +42,7 @@ for subject in set(subject_list):
 			if cnt>MaxLimit: break
 			print("Scratching "+url)
 			page = get(url)
-			title = re.search('<h1><span property="v:summary">(.+)</span></h1>', page).group(1)
+			title = re.search('<h1><span property="v:summary">(.+)</span></h1>', page, flags=re.DOTALL).group(1)
 			star = re.search('<span property="v:rating" class="main-title-hide">(\w+)</span>', page).group(1)
 			time = re.search('class="main-meta">(.+)</span>', page).group(1)
 			vote = re.findall('<em id="ucount\w+">(\d*)</em>', page)
