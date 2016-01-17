@@ -41,16 +41,16 @@ for row in dataCSV:
 	subject, movie, title, star, time, useful, useless, content = row
 	words = [w.lower() for w in jieba.cut(content) if re.match(Accept_chars, w) and w.lower() not in English_stopwords and w not in Chinese_stopwords]
 	occur_list += list(set(words))
-	articles[int(subject)].append((int(useful), words))
+	articles[int(subject)].append((int(useful), int(useless), words))
 fd = nltk.FreqDist(occur_list)
 IDF = dict((w, math.log(total_article/fd[w])) for w in fd)
 
 for subject in sorted(articles):
 	weight = nltk.defaultdict(float)
 	sum_weight = 0
-	for (useful, words) in articles[subject]:
+	for (useful, useless, words) in articles[subject]:
 		TF_fd = nltk.FreqDist(words)
-		temp = useful+1
+		temp = 1#max(useful+1-useless, 0)
 		sum_weight += temp
 		for w in words:
 			weight[w] += temp*TF_fd.freq(w)
